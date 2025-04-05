@@ -1,0 +1,74 @@
+CREATE TABLE application_logs(
+    user_id INTEGER,
+    event_type TEXT,
+    event_time DATETIME,
+    comments TEXT,
+    FOREIGN KEY (user_id) REFERENCES user_profile(user_id)
+);
+
+
+CREATE TABLE trade_history (
+    trade_id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Unique trade identifier
+    user_id INTEGER NOT NULL,  -- Reference to the user who made the trade
+    money_in FLOAT,  -- Amount of money invested in the trade
+    risk_level INT,  -- Risk level setting at the time of trade (e.g., 1, 2, 3)
+    buying_time DATETIME,  -- Timestamp when the trade was opened (buy order executed)
+    selling_time DATETIME,  -- Timestamp when the trade was closed (sell order executed)
+    buy_price FLOAT,  -- Price at which the asset was bought
+    sell_price FLOAT,  -- Price at which the asset was sold
+    profit_loss FLOAT,  -- Profit or loss from the trade (sell_price - buy_price)
+    balance_before FLOAT,  -- Account balance before executing the trade
+    balance_after FLOAT,  -- Account balance after the trade was completed
+    rsi_buy FLOAT,  -- RSI (Relative Strength Index) value at the time of buying
+    macd_buy FLOAT,  -- MACD (Moving Average Convergence Divergence) value at buying
+    supertrend_buy FLOAT,  -- Supertrend indicator value at buying
+    rsi_sell FLOAT,  -- RSI value at the time of selling
+    macd_sell FLOAT,  -- MACD value at selling
+    supertrend_sell FLOAT,  -- Supertrend indicator value at selling
+    rsi_flag_buy INT,  -- RSI buy signal flag (1 = buy, 0 = no signal)
+    macd_flag_buy INT,  -- MACD buy signal flag (1 = buy, 0 = no signal)
+    supertrend_flag_buy INT,  -- Supertrend buy signal flag (1 = buy, 0 = no signal)
+    rsi_flag_sell INT,  -- RSI sell signal flag (1 = sell, 0 = no signal)
+    macd_flag_sell INT,  -- MACD sell signal flag (1 = sell, 0 = no signal)
+    supertrend_flag_sell INT  -- Supertrend sell signal flag (1 = sell, 0 = no signal)
+    FOREIGN KEY (user_id) REFERENCES user_profile(user_id)
+);
+
+CREATE TABLE risk_thresholds (
+    risk_level INT PRIMARY KEY,     -- 1 (Low), 2 (Medium), 3 (High)
+    invest_thres INT,               -- Investment threshold (%)
+    rsi_oversold INT,               -- RSI Oversold threshold
+    rsi_overbought INT,             -- RSI Overbought threshold
+    macd_fast_ema INT,              -- MACD Fast EMA (short-term EMA)
+    macd_slow_ema INT,              -- MACD Slow EMA (long-term EMA)
+    macd_signal_ema INT,            -- MACD Signal EMA
+    supertrend_atr_period INT,      -- ATR Period for Supertrend
+    supertrend_multiplier FLOAT     -- Supertrend Multiplier
+);
+
+
+INSERT INTO risk_thresholds VALUES (1, 30, 20, 80, 26, 52, 18, 20, 3.5);
+INSERT INTO risk_thresholds VALUES (2, 60, 30, 70, 12, 26, 9, 14, 3.0);
+INSERT INTO risk_thresholds VALUES (3, 90, 40, 60, 6, 13, 4, 7, 2.0);
+
+CREATE TABLE user_profile (
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    hashed_password TEXT, 
+    account_balance FLOAT
+)
+
+CREATE TABLE bitcoin_config (
+    config_code TEXT,
+    config_value TEXT
+)
+INSERT INTO bitcoin_config values("SALT_KEY", "od029gn2fb20");
+
+
+
+CREATE TABLE account_history (
+    user_id INT,
+    account_date DATETIME, 
+    account_balance FLOAT,
+    FOREIGN KEY (user_id) REFERENCES user_profile(user_id))
+

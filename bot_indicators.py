@@ -1,18 +1,25 @@
-import requests
 from api import BinanceAPI
-from datetime import datetime
 from datetime import datetime, timedelta
+from utils import Utils
 
 class BotIndicators:
-    def __init__(self, risk_level, thresholds):
+    def __init__(self, user_obj):
+        self.user_obj = user_obj
         self.symbol = "BTCUSDT"
         self.prices = None  # Stores fetched prices to avoid redundant API calls
         self.highs, self.lows, self.prices = None, None, None
-        self.thresholds = self.get_risk_thresholds(thresholds)
-        self.risk_level = risk_level
-        self.from_date = datetime.strptime('2024-11-05', "%Y-%m-%d")
-        self.to_date = datetime.strptime('2024-12-05', "%Y-%m-%d")
+        self.thresholds = self.get_risk_thresholds(self.user_obj.thresholds)
 
+        if self.user_obj.trading_preference == 1:
+            self.to_date = Utils.get_date()
+            self.from_date = Utils.get_date()
+            self.continuous_trade = True
+        else:
+            self.continuous_trade = False
+            self.from_date = self.user_obj.from_date
+            self.to_date = self.user_obj.to_date
+   
+        
     def get_risk_thresholds(self, thresholds):
 
     
@@ -26,18 +33,6 @@ class BotIndicators:
             "supertrend_atr_period": thresholds["supertrend_atr_period"][0],
             "supertrend_multiplier": thresholds["supertrend_multiplier"][0]
         }
-   
-    # def get_prices(self, period):
-    #     """Fetches closing prices from Binance API based on the given period."""
-    #     url = "https://api.binance.com/api/v3/klines"
-    #     params = {"symbol": self.symbol, "interval": "1d", "limit": period}
-    #     response = requests.get(url, params=params).json()
-
-    #     self.prices = [float(candle[4]) for candle in response]  # Store closing prices
-    #     self.highs = [float(candle[2]) for candle in response]  # Extract High prices
-    #     self.lows = [float(candle[3]) for candle in response]  # Extract Low prices
-    #     return
-
 
     def calculate_rsi(self, given_date):
         """Calculates and returns the RSI along with its status."""
@@ -70,26 +65,29 @@ class BotIndicators:
         # Compute RSI
         rs = avg_gain / avg_loss if avg_loss != 0 else 100  # Prevent division by zero
         self.rsi = 100 - (100 / (1 + rs))
-        #print("RSI ", self.rsi, self.thresholds["rsi_overbought"], self.thresholds["rsi_oversold"])
+        print("RSI ", self.rsi, self.thresholds["rsi_overbought"], self.thresholds["rsi_oversold"])
          # Determine RSI status
         if self.rsi > self.thresholds["rsi_overbought"]:
             status = "Sell"
 
-            self.rsi_flag = 0
+            self.rsi_flag = -1
         elif self.rsi < self.thresholds["rsi_oversold"]:
             status = "Buy"
             self.rsi_flag = 1
         else:
-            print("not enough rsi")
             self.rsi_flag = 0
 
         return
     
-    def calculate_historical_rsi(self, period=14):
+    def calculate_historical_rsi(self, given_date):
 
         """Calculate RSI based on closing prices."""
         period = 14
-        BinanceAPI.get_prices(self, 100)
+
+        #BinanceAPI.get_prices(self, period + 1)  # Fetch prices only if not already fetched
+        from_date = given_date - timedelta(days=100)
+        to_date = given_date 
+        BinanceAPI.get_prices_day_range(self, from_date, to_date)
         gains = []
         losses = []
 
@@ -125,26 +123,17 @@ class BotIndicators:
             rsi_values.append((rsi))
         self.rsi_values = rsi_values
     
-        # plt.figure(figsize=(10, 5))
-        # plt.plot(rsi_values, label="RSI", color="purple")
-        # plt.axhline(self.thresholds["rsi_overbought"], linestyle="--", color="red", label="Overbought (70)")
-        # plt.axhline(self.thresholds["rsi_oversold"], linestyle="--", color="green", label="Oversold (30)")
-        # plt.title("Relative Strength Index (RSI)")
-        # plt.xlabel("Days")
-        # plt.ylabel("RSI Value")
-        # plt.legend()
-        # plt.grid()
-        # plt.show()
-    
-    def calculate_macd(self):
+    def calculate_macd(self, given_date):
         
         fast_period = self.thresholds["macd_fast_ema"]
         slow_period = self.thresholds["macd_slow_ema"]
         signal_period = self.thresholds["macd_signal_ema"]
 
         required_period = 100#slow_period + signal_period  # Ensure enough data is fetched
-        
-        BinanceAPI.get_prices(self, required_period)
+
+        from_date = given_date - timedelta(days=required_period)
+        to_date = given_date 
+        BinanceAPI.get_prices_day_range(self, from_date, to_date)
 
         if len(self.prices) < required_period:
             print("Not enough data for MACD")
@@ -207,7 +196,7 @@ class BotIndicators:
                 self.macd_flag = 1
                 status = "Buy"
             elif macd_line[-1] < signal_line[-1] and macd_line[-2] >= signal_line[-2]:
-                self.macd_flag = 0
+                self.macd_flag = -1
                 status =  "Sell"
             else:
                 self.macd_flag = 0
@@ -216,22 +205,22 @@ class BotIndicators:
         else:
             self.macd_flag = 0
             print("Not enough data for MACD signals")
-
-        # Example usage (assuming macd_line and signal_line are already computed)
-        # Remove None values for proper plotting
+        print("macd ", macd_line[-1] , signal_line[-1] , macd_line[-2] , signal_line[-2])
+        self.macd = macd_line[-1]
         self.macd_line_filtered = [m for m in macd_line  ]
         self.signal_line_filtered = [s for s in signal_line]
 
-        #plot_macd(macd_line_filtered, "macd line", signal_line_filtered, "signal line")
-        self.macd = 0
-
-    def calculate_supertrend(self):
+    def calculate_supertrend(self, given_date):
         """Calculates Supertrend using risk-based parameters."""
         atr_period = self.thresholds["supertrend_atr_period"]
         multiplier = self.thresholds["supertrend_multiplier"]
         #period = atr_period * 3
         period = 100
-        BinanceAPI.get_prices(self, period)
+
+        #BinanceAPI.get_prices(self, period + 1)  # Fetch prices only if not already fetched
+        from_date = given_date - timedelta(days=period)
+        to_date = given_date 
+        BinanceAPI.get_prices_day_range(self, from_date, to_date)
         
         tr_list  = []
         atr = [None] * len(self.prices)
@@ -285,9 +274,9 @@ class BotIndicators:
         for i in range(atr_period+1, len(self.prices)):
             # if supertrend[i] is None or supertrend[i-1] is None:
             #     continue
-            if i > 0 and self.prices[i] > supertrend[i] and self.prices[i - 1] < supertrend[i - 1]:
+            if i > 0 and self.prices[i] > supertrend[i] :# and self.prices[i - 1] < supertrend[i - 1]:
                 signals[i] = "BUY"
-            elif i > 0 and self.prices[i] < supertrend[i] and self.prices[i - 1] > supertrend[i - 1]:
+            elif i > 0 and self.prices[i] < supertrend[i] :#and self.prices[i - 1] > supertrend[i - 1]:
                 signals[i]="SELL"
             else:
                 signals[i]="HOLD"
@@ -296,29 +285,7 @@ class BotIndicators:
         if signals[-1]=="BUY":
             self.st_flag = 1
         elif signals[-1]=="SELL":
-            self.st_flag=0
+            self.st_flag=-1
         else:
-            print("not enough st")
             self.st_flag=0
-
-        
-import matplotlib.pyplot as plt
-
-def plot_macd(min, max, macd_line, label_1, signal_line, label_2, prices, label_3):
-
-    plt.figure(figsize=(10, 5))
-    plt.ylim(min, max)
-    if label_1 != "none":
-        plt.plot(macd_line, label=label_1, color='green')
-    if label_2 != "none": 
-          plt.plot(signal_line, label=label_2, color='blue')
-    if label_3 != "none":
-        plt.plot(prices, label = label_3, color = 'red')
-    plt.axhline(y=0, color='black', linestyle='--', linewidth=0.8)
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('MACD and Signal Line')
-    plt.legend()
-    plt.show()
-
-
+        print("supertrend ", self.prices[-1] , supertrend[-1] ,  self.prices[-2] ,  supertrend[-2])

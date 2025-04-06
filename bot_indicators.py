@@ -3,13 +3,37 @@ from datetime import datetime, timedelta
 from utils import Utils
 
 class BotIndicators:
+    """
+    BotIndicators class calculates various trading indicators (RSI, MACD, Supertrend) 
+    based on historical price data for a given cryptocurrency symbol. It also uses these 
+    indicators to generate trading signals (Buy, Sell, Hold).
+
+    Attributes:
+        user_obj (object): User's configuration settings for thresholds, dates, and trading preferences.
+        symbol (str): The cryptocurrency symbol to track (e.g., "BTCUSDT").
+        prices (list): List to store fetched price data from Binance API.
+        highs (list): List to store the highest prices in the given timeframe.
+        lows (list): List to store the lowest prices in the given timeframe.
+        thresholds (dict): A dictionary of various risk thresholds for calculating indicators.
+        continuous_trade (bool): Flag to determine whether continuous trading is enabled.
+        from_date (datetime): The start date for fetching historical data.
+        to_date (datetime): The end date for fetching historical data.
+    """
+
     def __init__(self, user_obj):
+        """
+        Initializes the BotIndicators class with the user's settings and configurations.
+        
+        Args:
+            user_obj (object): The user's configuration object that contains trading preferences and thresholds.
+        """
         self.user_obj = user_obj
         self.symbol = "BTCUSDT"
         self.prices = None  # Stores fetched prices to avoid redundant API calls
         self.highs, self.lows, self.prices = None, None, None
         self.thresholds = self.get_risk_thresholds(self.user_obj.thresholds)
 
+        # Setup for continuous or non-continuous trading
         if self.user_obj.trading_preference == 1:
             self.to_date = Utils.get_date()
             self.from_date = Utils.get_date()
@@ -18,11 +42,17 @@ class BotIndicators:
             self.continuous_trade = False
             self.from_date = self.user_obj.from_date
             self.to_date = self.user_obj.to_date
-   
-        
-    def get_risk_thresholds(self, thresholds):
 
-    
+    def get_risk_thresholds(self, thresholds):
+        """
+        Extracts and returns risk thresholds from the user's configuration.
+
+        Args:
+            thresholds (dict): A dictionary containing various risk parameters.
+        
+        Returns:
+            dict: A dictionary of risk thresholds for trading indicators.
+        """
         return {
             "invest_thres": thresholds["invest_thres"][0],
             "rsi_oversold": thresholds["rsi_oversold"][0],
@@ -35,11 +65,18 @@ class BotIndicators:
         }
 
     def calculate_rsi(self, given_date):
-        """Calculates and returns the RSI along with its status."""
+        """
+        Calculates the Relative Strength Index (RSI) for the given date based on historical price data.
+
+        Args:
+            given_date (datetime): The date for which to calculate RSI.
+        
+        Returns:
+            None: The RSI value is stored in the instance variable `self.rsi`.
+        """
         period = 14
-        #BinanceAPI.get_prices(self, period + 1)  # Fetch prices only if not already fetched
         from_date = given_date - timedelta(days=period+1)
-        to_date = given_date 
+        to_date = given_date
         BinanceAPI.get_prices_day_range(self, from_date, to_date)
         gains, losses = [], []
 
@@ -66,10 +103,10 @@ class BotIndicators:
         rs = avg_gain / avg_loss if avg_loss != 0 else 100  # Prevent division by zero
         self.rsi = 100 - (100 / (1 + rs))
         print("RSI ", self.rsi, self.thresholds["rsi_overbought"], self.thresholds["rsi_oversold"])
-         # Determine RSI status
+        
+        # Determine RSI status (Buy, Sell, or Hold)
         if self.rsi > self.thresholds["rsi_overbought"]:
             status = "Sell"
-
             self.rsi_flag = -1
         elif self.rsi < self.thresholds["rsi_oversold"]:
             status = "Buy"
@@ -78,15 +115,20 @@ class BotIndicators:
             self.rsi_flag = 0
 
         return
-    
+
     def calculate_historical_rsi(self, given_date):
+        """
+        Calculates the historical RSI based on closing prices over a given time period.
 
-        """Calculate RSI based on closing prices."""
+        Args:
+            given_date (datetime): The date for which to calculate historical RSI.
+        
+        Returns:
+            None: The historical RSI values are stored in `self.rsi_values`.
+        """
         period = 14
-
-        #BinanceAPI.get_prices(self, period + 1)  # Fetch prices only if not already fetched
         from_date = given_date - timedelta(days=100)
-        to_date = given_date 
+        to_date = given_date
         BinanceAPI.get_prices_day_range(self, from_date, to_date)
         gains = []
         losses = []
@@ -106,8 +148,8 @@ class BotIndicators:
 
         rsi_values = []
 
+        # Calculate smoothed moving average method for the remaining RSI values
         for i in range(period, len(self.prices)):
-            # Smoothed moving average method
             gain = gains[i - 1]
             loss = losses[i - 1]
 
@@ -122,17 +164,24 @@ class BotIndicators:
             rsi = 100 - (100 / (1 + rs))
             rsi_values.append((rsi))
         self.rsi_values = rsi_values
-    
+
     def calculate_macd(self, given_date):
+        """
+        Calculates the Moving Average Convergence Divergence (MACD) indicator.
+
+        Args:
+            given_date (datetime): The date for which to calculate MACD.
         
+        Returns:
+            None: The MACD values and signals are stored in instance variables.
+        """
         fast_period = self.thresholds["macd_fast_ema"]
         slow_period = self.thresholds["macd_slow_ema"]
         signal_period = self.thresholds["macd_signal_ema"]
 
-        required_period = 100#slow_period + signal_period  # Ensure enough data is fetched
-
+        required_period = 100
         from_date = given_date - timedelta(days=required_period)
-        to_date = given_date 
+        to_date = given_date
         BinanceAPI.get_prices_day_range(self, from_date, to_date)
 
         if len(self.prices) < required_period:
@@ -151,67 +200,63 @@ class BotIndicators:
         ema_fast = sum(self.prices[:fast_period]) / fast_period
         ema_slow = sum(self.prices[:slow_period]) / slow_period
 
-        # Place first EMA values in correct index
-        ema_fast_list[fast_period - 1] = ema_fast
-        ema_slow_list[slow_period - 1] = ema_slow
-
-        # Compute EMAs iteratively
+        # Compute the remaining EMA values iteratively
         for i in range(slow_period, len(self.prices)):
             ema_fast = (self.prices[i] - ema_fast) * multiplier_fast + ema_fast
             ema_slow = (self.prices[i] - ema_slow) * multiplier_slow + ema_slow
             ema_fast_list[i] = ema_fast
             ema_slow_list[i] = ema_slow
-        #print("ema fast and slow ", ema_fast_list, ema_slow_list)
+
+        # Calculate MACD line by subtracting fast EMA from slow EMA
         macd_line = [None] * len(self.prices)
         for i in range(len(self.prices)):
             if ema_fast_list[i] is not None and ema_slow_list[i] is not None:
-                macd_line[i]=(ema_fast_list[i] - ema_slow_list[i])
-            
+                macd_line[i] = ema_fast_list[i] - ema_slow_list[i]
 
-        # Filter out None values for signal line calculation
+        # Generate Signal Line by applying EMA to MACD line
         valid_macd = [m for m in macd_line if m is not None]
-        #print("valid macd ", valid_macd)
         if len(valid_macd) < signal_period:
-            print("valid less than signal")
+            print("Not enough data for Signal Line")
 
-        # Compute first Signal EMA
         signal_ema = sum(valid_macd[:signal_period]) / signal_period
         signal_line = [None] * (slow_period + signal_period - 2) + [signal_ema]
 
         for i in range(0, len(valid_macd)):
             signal_ema = (valid_macd[i] - signal_ema) * multiplier_signal + signal_ema
             signal_line.append(signal_ema)
-        #print("signal ema ", signal_ema)
-        # Ensure valid MACD and Signal Line before generating signals
-        if len(macd_line) < 2 or len(signal_line) < 2 or macd_line[-1] is None or macd_line[-2] is None:
-            print("wrong macd and singal")
-        #print("macd line ", macd_line)
-        #print("signal line ", signal_line)
-        # Generate Buy/Sell/Hold signals
-        if (
-        macd_line[-1] is not None and macd_line[-2] is not None and 
-        signal_line[-1] is not None and signal_line[-2] is not None
-        ):
-            if macd_line[-1] > signal_line[-1] and macd_line[-2] <= signal_line[-2]:
-                self.macd_flag = 1
-                status = "Buy"
-            elif macd_line[-1] < signal_line[-1] and macd_line[-2] >= signal_line[-2]:
-                self.macd_flag = -1
-                status =  "Sell"
-            else:
-                self.macd_flag = 0
 
-                status = "Hold"
+        # Generate Buy/Sell/Hold signals based on MACD crossovers
+        if len(macd_line) < 2 or len(signal_line) < 2 or macd_line[-1] is None or macd_line[-2] is None:
+            print("Not enough data for MACD signals")
+
+        if (
+            macd_line[-1] > signal_line[-1] and macd_line[-2] <= signal_line[-2]
+        ):
+            self.macd_flag = 1
+            status = "Buy"
+        elif (
+            macd_line[-1] < signal_line[-1] and macd_line[-2] >= signal_line[-2]
+        ):
+            self.macd_flag = -1
+            status = "Sell"
         else:
             self.macd_flag = 0
-            print("Not enough data for MACD signals")
-        print("macd ", macd_line[-1] , signal_line[-1] , macd_line[-2] , signal_line[-2])
+            status = "Hold"
+
         self.macd = macd_line[-1]
-        self.macd_line_filtered = [m for m in macd_line  ]
+        self.macd_line_filtered = [m for m in macd_line]
         self.signal_line_filtered = [s for s in signal_line]
 
     def calculate_supertrend(self, given_date):
-        """Calculates Supertrend using risk-based parameters."""
+        """
+        Calculates the Supertrend indicator, which is based on the Average True Range (ATR) and a multiplier.
+
+        Args:
+            given_date (datetime): The date for which to calculate the Supertrend.
+        
+        Returns:
+            None: The Supertrend values and signals are stored in instance variables.
+        """
         atr_period = self.thresholds["supertrend_atr_period"]
         multiplier = self.thresholds["supertrend_multiplier"]
         #period = atr_period * 3

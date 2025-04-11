@@ -26,62 +26,6 @@ class BinanceAPI:
                 return(f"Error: Unexpected response API format.")
             
     @staticmethod
-    def get_btc_ohlc():
-        """Fetches the last 30 days of BTC/USDT OHLC data from Binance API."""
-        endpoint = f"{BinanceAPI.API_BASE_URL}/klines"
-        params = {"symbol": "BTCUSDT", "interval": "1d", "limit": 30}
-
-        try:
-            response = requests.get(endpoint, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-
-            ohlc_data = []
-            for candle in data:
-                timestamp = datetime.datetime.fromtimestamp(candle[0] / 1000)
-                ohlc_data.append([
-                    mdates.date2num(timestamp),
-                    float(candle[1]),  # Open
-                    float(candle[2]),  # High
-                    float(candle[3]),  # Low
-                    float(candle[4])   # Close
-                ])
-            return ohlc_data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Request error: {e}")
-            return None
-        except (ValueError, KeyError, IndexError) as e:
-            print(f"Data processing error: {e}")
-            return None
-
-    
-    @staticmethod
-    def get_prices(data, period):
-        """Fetches closing prices from Binance API based on the given period."""
-        endpoint = f"{BinanceAPI.API_BASE_URL}/klines"
-        params = {"symbol": "BTCUSDT", "interval": "1d", "limit": period}
-
-        try:
-            response = requests.get(endpoint, params=params, timeout=10)
-            response.raise_for_status()
-            candles = response.json()
-
-            data.prices = [float(candle[4]) for candle in candles]  # Closing prices
-            data.highs = [float(candle[2]) for candle in candles]   # High prices
-            data.lows = [float(candle[3]) for candle in candles]    # Low prices
-            return(len(data.prices))
-
-        except requests.exceptions.RequestException as e:
-            print(f"Request error: {e}")
-            return(0)
-        except (ValueError, KeyError, IndexError) as e:
-            print(f"Data processing error: {e}")
-            return(0)
-            
-    
-
-    @staticmethod
     def get_price_on_day(given_date):
         """
         Fetch the closing price for a given symbol on a specific day from Binance Testnet.

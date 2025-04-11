@@ -1,5 +1,3 @@
-import requests
-import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.figure import Figure
@@ -11,24 +9,47 @@ from utils import Utils
 from datetime import datetime, timedelta
 
 class BTCCandlestickChart:
-    def __init__(self, parent):
-        """Initializes the candlestick chart inside the given Tkinter parent widget."""
+    def __init__(self, parent, bi_class):
+        """Initializes the candlestick chart inside the given Tkinter parent widget.
+        
+        Args:
+            parent: The Tkinter parent widget where the chart will be embedded.
+            bi_class: A class that holds the trading data and technical indicators.
+        """
         self.parent = parent
 
-        current_date = Utils.get_date()
-        from_date = current_date - timedelta(days=30)
-        self.ohlc_data = BinanceAPI.get_ohlc_day_range(from_date, current_date)
+    def get_ohlc_data(self, trading_preference, from_date, to_date):
+        """Fetches the OHLC data for the specified date range.
+        
+        If trading_preference is 1, it fetches data for the last 30 days.
+        
+        Args:
+            trading_preference: An integer indicating the preferred trading duration.
+            from_date: The start date for fetching OHLC data.
+            to_date: The end date for fetching OHLC data.
+        """
+        if trading_preference == 1:
+            from_date = Utils.get_date() - timedelta(days=30)
+            to_date = Utils.get_date()
 
+        # Get OHLC data from Binance API
+        self.ohlc_data = BinanceAPI.get_ohlc_day_range(from_date, to_date)
 
     def plot_indicator_graphs(self, bi_class):
-        """Plot RSI, MACD, Supertrend, and Prices in a 2x2 Matplotlib figure inside Tkinter without explicitly passing X values."""
-
+        """Plots RSI, MACD, Supertrend, and Prices in a 2x2 Matplotlib figure inside Tkinter without explicitly passing X values.
+        
+        Args:
+            bi_class: A class that contains the necessary data for plotting the indicators.
+        """
         # Create a Matplotlib Figure with 2x2 subplots
-        fig = Figure(figsize=(12, 6))
+        fig = Figure(figsize=(12, 8))
         ax1 = fig.add_subplot(221)  # RSI
         ax2 = fig.add_subplot(222)  # MACD
         ax3 = fig.add_subplot(223)  # Supertrend
         ax4 = fig.add_subplot(224)  # Prices
+
+        # Adjust subplot spacing
+        fig.subplots_adjust(hspace=0.4,  wspace=0.3)
 
         # Extract data from bi_class
         y1 = bi_class.rsi_values  # RSI values
@@ -55,8 +76,7 @@ class BTCCandlestickChart:
         ax2.set_xlabel("Days")
         
 
-        # Plot Supertrend\
-       
+        # Plot Supertrend
         ax3.plot(y31, label="Buy Signal", color="green")
         ax3.plot(y32, label="Price", color="blue")
         ax3.plot(y33, label="Sell Signal", color="red")
@@ -79,53 +99,35 @@ class BTCCandlestickChart:
 
         # Embed the Matplotlib figure in Tkinter
         self.canvas = FigureCanvasTkAgg(fig, master=self.parent)
-        self.plot_candlestick_chart(fig,ax1)
-        # self.ax.grid()
-        self.canvas.draw()
+        self.plot_candlestick_chart(fig, ax1)  # Call to plot the candlestick chart
+        self.canvas.draw()  # Draw the canvas
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-
-
-    # def get_btc_ohlc(self):
-    #     """Fetches the last 30 days of BTC/USDT OHLC data from Binance API."""
-    #     url = "https://api.binance.com/api/v3/klines"
-    #     params = {"symbol": "BTCUSDT", "interval": "1d", "limit": 30}
-    #     response = requests.get(url, params=params).json()
-
-    #     ohlc_data = []
-    #     for candle in response:
-    #         timestamp = datetime.datetime.fromtimestamp(candle[0] / 1000)
-    #         ohlc_data.append([
-    #             mdates.date2num(timestamp),
-    #             float(candle[1]),  # Open
-    #             float(candle[2]),  # High
-    #             float(candle[3]),  # Low
-    #             float(candle[4])   # Close
-    #         ])
-    #     return ohlc_data
-
     def plot_candlestick_chart(self, fig, ax):
-        """Plots the BTC/USDT candlestick chart inside Tkinter."""
+        """Plots the BTC/USDT candlestick chart inside Tkinter.
+        
+        Args:
+            fig: The Matplotlib figure object.
+            ax: The axis object where the candlestick chart will be plotted.
+        """
         self.fig = fig
         self.ax = ax
 
-
-
-        # Bind Mouse Hover Event
+        # Bind Mouse Hover Event to handle tooltip
         self.canvas.mpl_connect("motion_notify_event", self.on_hover)
 
         # Format x-axis for dates
-        self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-        self.ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))
+        self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))  # Date format
+        self.ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))  # X-axis tick interval
         for label in self.ax.get_xticklabels():
-            label.set_rotation(45)
+            label.set_rotation(45)  # Rotate labels for better readability
             label.set_horizontalalignment('right')
 
-
+        # Plot each candlestick (OHLC) data
         for x, o, h, l, c in self.ohlc_data:
-            color = 'g' if c >= o else 'r'
-            self.ax.plot([x, x], [l, h], color=color)  # Wick
-            self.ax.add_patch(Rectangle((x - 0.3, min(o, c)), 0.6, abs(o - c), color=color))
+            color = 'g' if c >= o else 'r'  # Green for bullish, red for bearish candlesticks
+            self.ax.plot([x, x], [l, h], color=color)  # Wick (line between high and low)
+            self.ax.add_patch(Rectangle((x - 0.3, min(o, c)), 0.6, abs(o - c), color=color))  # Body of the candlestick
 
         # Annotation for OHLC tooltip
         self.ohlc_annot = self.ax.annotate("", xy=(0, 0), xytext=(-50, 50), textcoords="offset points",
@@ -133,39 +135,51 @@ class BTCCandlestickChart:
                                            arrowprops=dict(arrowstyle="->"))
         self.ohlc_annot.set_visible(False)
 
+        # Set the title and labels for the chart
         self.ax.set_title("BTC/USDT")
-        self.ax.set_xlabel("Date")
         self.ax.set_ylabel("Price($)")
-        # self.ax.grid()
-        # self.canvas.draw()
 
     def is_cursor_on_candlestick(self, event):
-        """Checks if the cursor is over a candlestick body."""
+        """Checks if the cursor is over a candlestick body.
+        
+        Args:
+            event: The event object generated when the user hovers the cursor.
+        
+        Returns:
+            int: The index of the candlestick if hovered, None otherwise.
+        """
         for i, (x, o, h, l, c) in enumerate(self.ohlc_data):
             if abs(x - event.xdata) < 0.3 and l <= event.ydata <= h:
                 return i
         return None
 
     def update_ohlc_annot(self, index):
-        """Updates the OHLC tooltip when hovering over a candlestick."""
+        """Updates the OHLC tooltip when hovering over a candlestick.
+        
+        Args:
+            index: The index of the candlestick being hovered.
+        """
         x, o, h, l, c = self.ohlc_data[index]
-        self.ohlc_annot.xy = (x, c)
+        self.ohlc_annot.xy = (x, c)  # Set the position of the annotation
         text = f"Date: {mdates.num2date(x).strftime('%b %d')}\nOpen: {o}\nHigh: {h}\nLow: {l}\nClose: {c}"
-        self.ohlc_annot.set_text(text)
-        self.ohlc_annot.get_bbox_patch().set_alpha(0.9)
+        self.ohlc_annot.set_text(text)  # Set the text of the tooltip
+        self.ohlc_annot.get_bbox_patch().set_alpha(0.9)  # Set tooltip transparency
 
     def on_hover(self, event):
-        """Handles the hover event for showing tooltips."""
+        """Handles the hover event for showing tooltips when hovering over candlesticks.
+        
+        Args:
+            event: The event object generated when the user hovers the cursor.
+        """
         if event.inaxes == self.ax:
-            candlestick_index = self.is_cursor_on_candlestick(event)
+            candlestick_index = self.is_cursor_on_candlestick(event)  # Check if hovering over a candlestick
             if candlestick_index is not None:
-                self.update_ohlc_annot(candlestick_index)
-                self.ohlc_annot.set_visible(True)
+                self.update_ohlc_annot(candlestick_index)  # Update tooltip with OHLC data
+                self.ohlc_annot.set_visible(True)  # Make tooltip visible
             else:
-                self.ohlc_annot.set_visible(False)
+                self.ohlc_annot.set_visible(False)  # Hide tooltip if not hovering over a candlestick
 
-            self.canvas.draw_idle()
+            self.canvas.draw_idle()  # Update the canvas to refresh the tooltip
         else:
-            self.ohlc_annot.set_visible(False)
-            self.canvas.draw_idle()
-
+            self.ohlc_annot.set_visible(False)  # Hide tooltip when not hovering over the chart
+            self.canvas.draw_idle()  # Update the canvas

@@ -8,8 +8,6 @@ import re
 from btccschart import BTCCandlestickChart
 from bot_indicators import BotIndicators
 from activate_bot import ActivateBot
-import time
-import requests
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
@@ -38,8 +36,6 @@ class DisplayPictures:
         # Display page heading
         tk.Label(page_obj, text=page_heading, font=("Arial", 60)).place(relx=0.5, rely=0.1, anchor="center")
 
-        # [Skill] Use of GUI / OOP classes / image manipulation – Middle to Top mark band
-
 class BasePage(tk.Tk):
     def __init__(self, title):
         super().__init__()
@@ -49,8 +45,6 @@ class BasePage(tk.Tk):
     def navigate_to(self, page_class, *args):
         self.destroy()  # Close current page
         page_class(*args).mainloop()  # Load new page
-
-        # [Skill] Simple OOP classes and navigation logic – Middle mark band
 
 class LoginPage(BasePage):
     def __init__(self):
@@ -79,9 +73,6 @@ class LoginPage(BasePage):
 
         self.status_label = tk.Label(self, text="")  # To display success/error messages
         self.status_label.pack(pady=5)
-
-        # [Skill] GUI design with event-driven programming – Middle mark band
-        # [Skill] Use of classes and user input validation – Middle to Top mark band
 
     def show_username_rules(self):
         # Show popup with username requirements
@@ -114,7 +105,6 @@ class LoginPage(BasePage):
 
         tk.Button(popup, text="Close", command=popup.destroy).pack(pady=10)
 
-        # [Skill] Use of GUI and simple logic – Middle mark band
 
     def handle_login(self):
         # Get values from entries and validate them
@@ -128,8 +118,6 @@ class LoginPage(BasePage):
             self.auth.close()
             self.navigate_to(PreferencePage, username)
 
-        # [Skill] Simple client-server model (if AuthManager connects to a database or file) – Middle mark band
-        # [Skill] Handling input, validation, and navigation – Middle to Top mark band
 
     def validate_user(self, username: str, password: str) -> bool:
         # Username validation logic
@@ -159,8 +147,6 @@ class LoginPage(BasePage):
         
         return True
 
-        # [Skill] Use of regular expressions – Top mark band
-        # [Skill] Use of string manipulation and validation – Middle to Top mark band
 
     def handle_register(self):
         # Handles registration after validation
@@ -174,14 +160,11 @@ class LoginPage(BasePage):
         else:
             print("Invalid user")
 
-        # [Skill] Complex validation logic and conditional flows – Top mark band
-        # [Skill] Use of authentication and possibly file or SQL handling – Middle mark band
 
     def on_close(self):
         # Gracefully close DB connection and app window
         self.auth.close()
         self.destroy()
-
 
 class PreferencePage(BasePage):
     def __init__(self, username):
@@ -227,7 +210,6 @@ class PreferencePage(BasePage):
     def go_homepage(self):
         self.db = DatabaseManager(self.trading_preference)  # Connect to DB with preference
         self.navigate_to(HomePage, self)  # Navigate to home with full user_obj
-        self.destroy()
 
 class AccountPage(BasePage):
     def __init__(self, user_obj):
@@ -267,7 +249,7 @@ class AccountPage(BasePage):
                 self.navigate_to(HomePage, self.user_obj)
                 self.destroy()
             else:
-                messagebox.showerror("Error", "Failed to update balance. Account Balance should be between 500$ and 5000$")
+                messagebox.showerror("Error", "Failed to update balance. Account Balance should be between 500$ and 30000$")
         except ValueError:
             messagebox.showerror("Error", "Invalid input! Please enter a valid number.")
 
@@ -299,7 +281,7 @@ class HomePage(BasePage):
     
     def profile(self):
         self.navigate_to(ProfilePage, self.user_obj)
-
+        self.destroy()
     def add_money(self):
         self.navigate_to(AccountPage, self.user_obj)
         self.destroy()
@@ -332,12 +314,12 @@ class DatePage(BasePage):
         tk.Label(self, text="From Date:", **btn_style).place(relx=0.3, rely=0.3)
         self.from_date_entry = tk.Entry(self, bd=5, font=("Arial", 30), width=20)
         self.from_date_entry.place(relx=0.3, rely=0.4)
-        self.from_date_entry.insert(0, "2024-01-01")
+        self.from_date_entry.insert(0, "YYYY-MM-DD")
 
         tk.Label(self, text="To Date:", **btn_style).place(relx=0.5, rely=0.3)
         self.to_date_entry = tk.Entry(self, bd=5, font=("Arial", 30), width=20)
         self.to_date_entry.place(relx=0.5, rely=0.4)
-        self.to_date_entry.insert(0, "2024-02-01")
+        self.to_date_entry.insert(0, "YYYY-MM-DD")
 
         # Confirm button
         tk.Button(self, text="Confirm", **btn_style, command=self.handle_date_entry).place(relx=0.5, rely=0.8, anchor="center")
@@ -364,7 +346,6 @@ class DatePage(BasePage):
     def go_riskpage(self):
         self.navigate_to(RiskPage, self.user_obj)
         self.destroy()
-
 
 class TradeHistoryPage(BasePage):
     # Maps internal database column names to human-readable labels
@@ -600,7 +581,6 @@ class RiskPage(BasePage):
     def go_homepage(self):
         self.navigate_to(HomePage, self.user_obj)
         self.destroy()
-
 
 class WorkStationPage(BasePage):
     """

@@ -1,13 +1,13 @@
 import requests
-import datetime
+from datetime import datetime, timedelta
 import matplotlib.dates as mdates
-import time
+
 
 class BinanceAPI:
     @staticmethod
     def get_ticker_price( symbol="BTCUSDT"):
 
-            BASE_URL = "https://testnet.binance.vision/api"
+            BASE_URL = "https://api.binance.com/api"
             """Fetch the latest price for a given symbol from Binance Testnet."""
             endpoint = f"{BASE_URL}/v3/ticker/price"
             params = {"symbol": symbol}
@@ -62,19 +62,18 @@ class BinanceAPI:
         Returns:
             float: Closing price for that day, or error message if not found.
         """
-        BASE_URL = "https://testnet.binance.vision/api"
+        BASE_URL = "https://api.binance.com/api"
         endpoint = f"{BASE_URL}/v3/klines"
 
-        start_time = int(given_date.timestamp() * 1000)
-        end_time = given_date + datetime.timedelta(days=1)
-        end_time = int(end_time.timestamp() * 1000)
+        from_ts = given_date - timedelta(days=1)
+        from_ts = int(from_ts.timestamp() * 1000) 
+        to_ts = int(given_date.timestamp() * 1000) 
 
         params = {
             "symbol": "BTCUSDT",
             "interval": "1d",
-            "startTime": start_time,
-            "endTime": end_time,
-            "limit": 1
+            "startTime": from_ts,
+            "endTime": to_ts
         }
 
         response = requests.get(endpoint, params=params)
@@ -138,7 +137,7 @@ class BinanceAPI:
         response = requests.get(url, params=params).json()
         ohlc_data = []
         for candle in response:
-            timestamp = datetime.datetime.fromtimestamp(candle[0] / 1000)
+            timestamp = datetime.fromtimestamp(candle[0] / 1000)
             ohlc_data.append([
                 mdates.date2num(timestamp),
                 float(candle[1]),  # Open

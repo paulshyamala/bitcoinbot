@@ -1,58 +1,37 @@
 # 📊 Quantitative Cryptocurrency Trading Platform (Bitcoin)
 
-> Learn technical analysis while an AI bot trades Bitcoin for you — and explains every decision.
-
-  
-
 ***
 
 ## 🎯 What Is This?
 
-A **beginner-friendly Bitcoin trading bot** that combines three powerful technical indicators (RSI, MACD, Supertrend) to make automated buy/sell decisions. Unlike typical trading bots, this platform **teaches you** by showing exactly why each trade was executed.[1]
+A **beginner-friendly Bitcoin trading bot** that combines three powerful technical indicators (RSI, MACD, Supertrend) to make automated buy/sell decisions. Unlike typical trading bots, this platform **teaches you** by showing exactly why each trade was executed.
 
 Perfect for learning algorithmic trading without risking real money.
 
-![App Screenshot - Add your main dashboard screenshot here]
+<img width="465" height="238" alt="image" src="https://github.com/user-attachments/assets/dec05704-abe8-4865-bc3a-9836fb0bb9c8" />
+
 
 ***
 
 ## ✨ Key Features
 
-🤖 **Smart Trading Logic** — When 2 out of 3 indicators agree, the bot trades[1]
-📚 **Educational Feedback** — See RSI values, MACD crossovers, and Supertrend signals after every trade[1]
-⚖️ **3 Risk Levels** — Adjust trading aggressiveness and indicator sensitivity[1]
-📈 **Live Charts** — Real-time visualization of all indicators and price action  
-🕐 **Historical Backtesting** — Test strategies on past data before going live[1]
-💾 **Trade History** — Complete database of past trades with profit/loss tracking[1]
+🤖 **Smart Trading Logic** — When 2 out of 3 indicators agree, the bot trades  
+📚 **Educational Feedback** — See RSI values, MACD crossovers, and Supertrend signals after every trade  
+⚖️ **3 Risk Levels** — Adjust trading aggressiveness and indicator sensitivity  
+📈 **Live Charts** — Real-time visualization of all indicators and price action       
+🕐 **Historical Backtesting** — Test strategies on past data before going live  
+💾 **Trade History** — Complete database of past trades with profit/loss tracking
 
 ***
 
-## 🚀 Quick Start
+<img width="464" height="237" alt="image" src="https://github.com/user-attachments/assets/d9bce16c-2f7d-4984-a4b7-3f57175409e2" />
 
-### Installation
-
-```bash
-git clone https://github.com/yourusername/quant-crypto-platform.git
-cd quant-crypto-platform
-pip install tkinter matplotlib pandas requests
-python main.py
-```
-
-### First Steps
-
-1. **Create Account** — Register with username and password
-2. **Choose Risk Level** — Select 1 (Conservative), 2 (Moderate), or 3 (Aggressive)
-3. **Pick Trading Mode** — Live (real-time) or Historical (backtesting)
-4. **Activate Bot** — Watch it analyze Bitcoin and make trades
-5. **Review Trades** — Learn from detailed breakdowns of each decision
-
-![Trading Flow GIF - Add animated demo here]
 
 ***
 
 ## 🧮 How It Works
 
-The platform uses **quantitative analysis** with three technical indicators:[1]
+The platform uses **quantitative analysis** with three technical indicators:
 
 | Indicator | What It Does | Buy Signal | Sell Signal |
 |-----------|--------------|------------|-------------|
@@ -60,7 +39,7 @@ The platform uses **quantitative analysis** with three technical indicators:[1]
 | **MACD** | Detects trend changes | Line crosses above signal | Line crosses below signal |
 | **Supertrend** | Volatility-based trends | Price above band | Price below band |
 
-**Decision Rule**: Trades execute when at least 2 indicators agree.[1]
+**Decision Rule**: Trades execute when at least 2 indicators agree.
 
 ### Example Trade Breakdown
 
@@ -72,17 +51,18 @@ The platform uses **quantitative analysis** with three technical indicators:[1]
 └─ Result: 2/3 indicators agree → EXECUTE BUY
 ```
 
-![Indicator Charts - Add screenshot of the 4-panel visualization]
+<img width="465" height="238" alt="image" src="https://github.com/user-attachments/assets/2d1d66ca-c1dd-4274-a72a-8dc223f60f19" />
+
 
 ***
 
 ## 🎓 Why Use This?
 
-**Problem**: 95% of traders lose money because they trade emotionally without understanding technical analysis.[1]
+**Problem**: 95% of traders lose money because they trade emotionally without understanding technical analysis.
 
-**Solution**: This platform automates trading while showing you the "why" behind each decision. After 10-20 trades, you'll understand RSI oversold conditions, MACD crossovers, and trend following.[1]
+**Solution**: This platform automates trading while showing you the "why" behind each decision. After 10-20 trades, you'll understand RSI oversold conditions, MACD crossovers, and trend following.
 
-**Educational Focus**: Built from interviews with beginner traders who wanted to learn, not just earn.[1]
+**Educational Focus**: Built from interviews with beginner traders who wanted to learn, not just earn.
 
 ***
 
@@ -99,7 +79,8 @@ The platform uses **quantitative analysis** with three technical indicators:[1]
 └── btccschart.py        # Matplotlib chart generation
 ```
 
-**Database**: 6 tables including user profiles, trade history, application logs, and risk configurations.[1]
+**Database**: 6 tables including user profiles, trade history, application logs, and risk configurations.
+<img width="567" height="576" alt="image" src="https://github.com/user-attachments/assets/72f37e81-e6d9-4417-84a8-cc460d9897f7" />
 
 ***
 
@@ -107,51 +88,28 @@ The platform uses **quantitative analysis** with three technical indicators:[1]
 
 ### Risk Levels
 
-Each level adjusts 5+ parameters:[1]
+Each level adjusts 5+ parameters:
 
 - **Level 1 (Low)**: 10% investment per trade, conservative RSI thresholds (30/70)
 - **Level 2 (Medium)**: 20% investment, moderate sensitivity (40/60)
 - **Level 3 (High)**: 40% investment, aggressive signals (45/55)
 
+<img width="465" height="238" alt="image" src="https://github.com/user-attachments/assets/29705a94-123a-480d-ac6c-4e5a3a8a1d56" />
+
+
 ### Trading Modes
 
 - **Live**: Uses current Binance API data for real-time decisions
-- **Historical**: Backtests on past 100+ days of Bitcoin price history[1]
+- **Historical**: Backtests on past 100+ days of Bitcoin price history
+<img width="465" height="238" alt="image" src="https://github.com/user-attachments/assets/3c66bf54-ff71-413b-b1dc-93e9f53d2336" />
 
 ***
 
 ## 🛡️ Disclaimer
 
-⚠️ **Educational Use Only** — This is a paper trading platform (no real money involved)[1]
-⚠️ **Not Financial Advice** — Technical indicators can fail; past performance ≠ future results[1]
-⚠️ **API Limitations** — Subject to Binance rate limits and potential downtime[1]
+⚠️ **Educational Use Only** — This is a paper trading platform (no real money involved)
+⚠️ **Not Financial Advice** — Technical indicators can fail; past performance ≠ future results
+⚠️ **API Limitations** — Subject to Binance rate limits and potential downtime
 
 ***
 
-## 🤝 Contributing
-
-This is an A-Level Computer Science project. Contributions welcome for:[1]
-- Additional indicators (Bollinger Bands, Stochastic)
-- Multi-asset support (Ethereum, altcoins)
-- Improved backtesting engine
-- Mobile app version
-
-***
-
-## 📄 License
-
-MIT License — Free to use for educational purposes.
-
-***
-
-## 🙏 Acknowledgments
-
-Built as an AQA Computer Science NEA by Paul Shyamala. Research based on trader interviews and analysis of platforms like Binance.[1]
-
-**Tech**: Python -  Tkinter -  Matplotlib -  Pandas -  SQLite -  Binance API
-
-***
-
-**Questions?** Open an issue or check the [Wiki](link-to-wiki) for detailed documentation.
-
-[1](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/69557010/cdc88ba4-d491-48d7-b385-618b2cdddc64/CS-NEA-Crypto-Bot-3.1-Final.docx)

@@ -1,5 +1,7 @@
 # 📊 Quantitative Cryptocurrency Trading Platform (Bitcoin)
 
+https://youtu.be/Q5ni4tGSIGM - Video explaining the whole project
+
 ***
 
 ## 🎯 What Is This?

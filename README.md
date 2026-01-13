@@ -2,25 +2,36 @@
 Quantitative Cryptocurrency Trading Platform (Bitcoin)
 
 🎯 What Is This?
-A beginner-friendly Bitcoin trading bot that combines three powerful technical indicators (RSI, MACD, Supertrend) to make automated buy/sell decisions. Unlike typical trading bots, this platform teaches you by showing exactly why each trade was executed.​
+
+A beginner-friendly Bitcoin trading bot that combines three powerful technical indicators (RSI, MACD, Supertrend) to make automated buy/sell decisions. Unlike typical trading bots, this platform teaches you by showing exactly why each trade was executed.
+​
 Perfect for learning algorithmic trading without risking real money.
 
 ✨ Key Features
-🤖 Smart Trading Logic — When 2 out of 3 indicators agree, the bot trades​
-📚 Educational Feedback — See RSI values, MACD crossovers, and Supertrend signals after every trade​
-⚖️ 3 Risk Levels — Adjust trading aggressiveness and indicator sensitivity​
+
+🤖 Smart Trading Logic — When 2 out of 3 indicators agree, the bot trades
+​
+📚 Educational Feedback — See RSI values, MACD crossovers, and Supertrend signals after every trade
+​
+⚖️ 3 Risk Levels — Adjust trading aggressiveness and indicator sensitivity
+​
 📈 Live Charts — Real-time visualization of all indicators and price action
-🕐 Historical Backtesting — Test strategies on past data before going live​
+
+🕐 Historical Backtesting — Test strategies on past data before going live
+​
 💾 Trade History — Complete database of past trades with profit/loss tracking
+
 
 🧮 How It Works
 The platform uses quantitative analysis with three technical indicators:
+
 ​
 Indicator	What It Does	Buy Signal	Sell Signal
 RSI	Measures momentum	< 30 (oversold)	> 70 (overbought)
 MACD	Detects trend changes	Line crosses above signal	Line crosses below signal
 Supertrend	Volatility-based trends	Price above band	Price below band
 Decision Rule: Trades execute when at least 2 indicators agree.
+
 ​
 Example Trade Breakdown
 text
@@ -31,8 +42,11 @@ text
 └─ Result: 2/3 indicators agree → EXECUTE BUY
 
 🎓 Why Use This?
+
 Problem: 95% of traders lose money because they trade emotionally without understanding technical analysis.
+
 Solution: This platform automates trading while showing you the "why" behind each decision. After 10-20 trades, you'll understand RSI oversold conditions, MACD crossovers, and trend following.
+
 Educational Focus: Built from interviews with beginner traders who wanted to learn, not just earn.
 
 📁 Project Structure
@@ -60,6 +74,7 @@ Historical: Backtests on past 100+ days of Bitcoin price history
 ​
 
 🛡️ Disclaimer
+
 ⚠️ Educational Use Only — This is a paper trading platform (no real money involved)
 ​
 ⚠️ Not Financial Advice — Technical indicators can fail; past performance ≠ future results

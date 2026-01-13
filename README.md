@@ -1,4 +1,4 @@
-# 📊 Quantitative Cryptocurrency Trading Platform (Bitcoin)
+# Quantitative Cryptocurrency Trading Platform (Bitcoin)
 
 https://youtu.be/Q5ni4tGSIGM - Video explaining the whole project
 
@@ -8,7 +8,6 @@ https://youtu.be/Q5ni4tGSIGM - Video explaining the whole project
 
 A **beginner-friendly Bitcoin trading bot** that combines three powerful technical indicators (RSI, MACD, Supertrend) to make automated buy/sell decisions. Unlike typical trading bots, this platform **teaches you** by showing exactly why each trade was executed.
 
-Perfect for learning algorithmic trading without risking real money.
 
 <img width="465" height="238" alt="image" src="https://github.com/user-attachments/assets/dec05704-abe8-4865-bc3a-9836fb0bb9c8" />
 
@@ -17,12 +16,12 @@ Perfect for learning algorithmic trading without risking real money.
 
 ## ✨ Key Features
 
-🤖 **Smart Trading Logic** — When 2 out of 3 indicators agree, the bot trades  
-📚 **Educational Feedback** — See RSI values, MACD crossovers, and Supertrend signals after every trade  
-⚖️ **3 Risk Levels** — Adjust trading aggressiveness and indicator sensitivity  
-📈 **Live Charts** — Real-time visualization of all indicators and price action       
-🕐 **Historical Backtesting** — Test strategies on past data before going live  
-💾 **Trade History** — Complete database of past trades with profit/loss tracking
+ **Smart Trading Logic** — When 2 out of 3 indicators agree, the bot trades  
+ **Educational Feedback** — See RSI values, MACD crossovers, and Supertrend signals after every trade  
+ **3 Risk Levels** — Adjust trading aggressiveness and indicator sensitivity  
+**Live Charts** — Real-time visualization of all indicators and price action       
+**Historical Backtesting** — Test strategies on past data before going live  
+ **Trade History** — Complete database of past trades with profit/loss tracking
 
 ***
 
@@ -92,9 +91,9 @@ The platform uses **quantitative analysis** with three technical indicators:
 
 Each level adjusts 5+ parameters:
 
-- **Level 1 (Low)**: 10% investment per trade, conservative RSI thresholds (30/70)
-- **Level 2 (Medium)**: 20% investment, moderate sensitivity (40/60)
-- **Level 3 (High)**: 40% investment, aggressive signals (45/55)
+- **Level 1 (Low)**:  conservative thresholds 
+- **Level 2 (Medium)**:  moderate sensitivity 
+- **Level 3 (High)**: aggressive signals
 
 <img width="465" height="238" alt="image" src="https://github.com/user-attachments/assets/29705a94-123a-480d-ac6c-4e5a3a8a1d56" />
 
@@ -109,9 +108,9 @@ Each level adjusts 5+ parameters:
 
 ## 🛡️ Disclaimer
 
-⚠️ **Educational Use Only** — This is a paper trading platform (no real money involved)
-⚠️ **Not Financial Advice** — Technical indicators can fail; past performance ≠ future results
-⚠️ **API Limitations** — Subject to Binance rate limits and potential downtime
+⚠️ **Educational Use Only** — This is a paper trading platform (no real money involved)  
+⚠️ **Not Financial Advice** — Technical indicators can fail; past performance ≠ future results  
+⚠️ **API Limitations** — Subject to Binance rate limits and potential downtime  
 
 ***
 
